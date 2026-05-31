@@ -3,29 +3,34 @@ import Header from "./components/Header";
 import MessageForm from "./components/MessageForm";
 import Message from "./components/Message";
 import Login from "./components/Login";
+import {io} from 'socket.io-client';
 
+const SOCKET_URL = 'https://api.vps.malejka.lowicz.pl';
 const API_URL = 'https://api.vps.malejka.lowicz.pl/api/messages';
+const socket = io(SOCKET_URL);
 function App(){
   const [wiadomosci,setWiadomosci] = useState([]);
 
   const [mojNick,setMojNick]=useState(localStorage.getItem('shoutboxNick') || '');
 
   
-  const pobierzDane = async()=>{
-    try{
-      const odpowiedz = await fetch(API_URL);
-      const dane = await odpowiedz.json();
-      setWiadomosci(dane)
-    }
-    catch(error){
-      console.error("Błąd pobierania",error);
-    }
-  };
+  // const pobierzDane = async()=>{
+  //   try{
+  //     const odpowiedz = await fetch(API_URL);
+  //     const dane = await odpowiedz.json();
+  //     setWiadomosci(dane)
+  //   }
+  //   catch(error){
+  //     console.error("Błąd pobierania",error);
+  //   }
+  // };
   useEffect(()=>{
-    pobierzDane();
-
-    const interval = setInterval(pobierzDane,200);
-    return () => clearInterval(interval);
+    //pobierzDane();
+    socket.on('chat_update',(noweWiadomosci) =>{
+      setWiadomosci(noweWiadomosci);
+    })
+    return () => 
+      socket.off('chat_update');
   },[]);
   const handleDodajWiadomosc = async(nowyTekst) =>{
     try{
@@ -48,7 +53,7 @@ function App(){
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({author:mojNick})
       });
-      pobierzDane();
+      //pobierzDane();
     }
     catch(error)
     {
@@ -65,7 +70,7 @@ function App(){
         method: 'DELETE'
       });
 
-      pobierzDane();
+      //pobierzDane();
     }
     catch(error)
     {
