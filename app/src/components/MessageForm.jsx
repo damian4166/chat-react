@@ -19,7 +19,7 @@ function MessageForm({onWyslij}){
                 value={tekst}
                 onChange={(e)=>setTekst(e.target.value)}
             />
-            <button type="submit">Wyślij bbbbb🚀</button>
+            <button type="submit">Wyślij🚀</button>
         </form>
     );
 }
