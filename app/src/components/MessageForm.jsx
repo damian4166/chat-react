@@ -1,6 +1,10 @@
 import { useState } from "react";
-function MessageForm({onWyslij}){
+function MessageForm({onWyslij, onTyping}){
     const [tekst,setTekst] = useState('');
+    const handleChange = (e) =>{
+        setTekst(e.target.value);
+        onTyping();
+    }
     const handleSubmit = (e) => {
         e.preventDefault();
         if(tekst.trim() === '')
@@ -17,7 +21,7 @@ function MessageForm({onWyslij}){
                 type="text" 
                 placeholder="Napisz wiadomość..."
                 value={tekst}
-                onChange={(e)=>setTekst(e.target.value)}
+                onChange={handleChange}
             />
             <button type="submit">Wyślij🚀</button>
         </form>

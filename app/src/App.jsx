@@ -12,26 +12,29 @@ function App(){
   const [wiadomosci,setWiadomosci] = useState([]);
 
   const [mojNick,setMojNick]=useState(localStorage.getItem('shoutboxNick') || '');
-
-  
-  // const pobierzDane = async()=>{
-  //   try{
-  //     const odpowiedz = await fetch(API_URL);
-  //     const dane = await odpowiedz.json();
-  //     setWiadomosci(dane)
-  //   }
-  //   catch(error){
-  //     console.error("Błąd pobierania",error);
-  //   }
-  // };
+  const [ktoPisze,setKtoPisze] = useState(null);
+ 
   useEffect(()=>{
-    //pobierzDane();
     socket.on('chat_update',(noweWiadomosci) =>{
       setWiadomosci(noweWiadomosci);
-    })
+    });
+let typingTimer;
+socket.on('is_typing',(nick) =>{
+  setKtoPisze(nick);
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(()=>{
+    setKtoPisze(null);
+  }, 2000);
+});
     return () => 
       socket.off('chat_update');
+      socket.off('is_typing');
   },[]);
+
+  const handleTyping = () =>{
+    socket.emit('typing', mojNick);
+  };
+
   const handleDodajWiadomosc = async(nowyTekst) =>{
     try{
       await fetch(API_URL,{
@@ -53,7 +56,6 @@ function App(){
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({author:mojNick})
       });
-      //pobierzDane();
     }
     catch(error)
     {
@@ -69,8 +71,6 @@ function App(){
       await fetch(`${API_URL}/${id}`,{
         method: 'DELETE'
       });
-
-      //pobierzDane();
     }
     catch(error)
     {
@@ -105,7 +105,12 @@ function App(){
         )
       }
       </div>
-      <MessageForm onWyslij={handleDodajWiadomosc}/>
+      {ktoPisze &&(
+        <div style={{padding: '0 20px', fontSize: '0.85em', color: '#7f8c8d', fontStyle: 'italic', marginBottom: '5px'}}>
+          ✏️ {ktoPisze} pisze wiadomość...
+        </div>
+      )}
+      <MessageForm onWyslij={handleDodajWiadomosc} onTyping={handleTyping}/>
 
     </div>
   );
