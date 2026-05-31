@@ -1,0 +1,20 @@
+services:
+  frontend-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chat-react
+    restart: unless-stopped
+    networks:
+      - proxy
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.react-router.rule=Host(`chatreact.vps.malejka.lowicz.pl`)"
+      - "traefik.http.routers.react-router.entrypoints=websecure"
+      - "traefik.http.routers.react-router.tls.certresolver=myresolver"
+      - "traefik.http.services.react-service.loadbalancer.server.port=80"
+
+networks:
+  proxy:
+    external: true
