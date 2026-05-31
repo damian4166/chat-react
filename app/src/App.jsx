@@ -4,7 +4,7 @@ import MessageForm from "./components/MessageForm";
 import Message from "./components/Message";
 import Login from "./components/Login";
 
-const API_URL = 'https://apichat.m89.pl/api/messages';
+const API_URL = 'https://api.vps.malejka.lowicz.pl/api/messages';
 function App(){
   const [wiadomosci,setWiadomosci] = useState([]);
 
